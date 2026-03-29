@@ -27,11 +27,20 @@ const manifest: PaperclipPluginManifestV1 = {
       knBaseUrl: {
         type: "string",
         description: "Knowledge Nexus API gateway URL",
-        default: "https://api.knowledgenexus.ai",
+        default: "http://localhost:8100",
       },
-      apiKey: {
+      knResearchUrl: {
         type: "string",
-        description: "Knowledge Nexus API key",
+        description: "Knowledge Nexus research service URL (nginx gateway)",
+        default: "http://localhost:8090",
+      },
+      knEmail: {
+        type: "string",
+        description: "Knowledge Nexus service account email",
+      },
+      knPassword: {
+        type: "string",
+        description: "Knowledge Nexus service account password",
       },
       defaultScope: {
         type: "string",
@@ -50,7 +59,7 @@ const manifest: PaperclipPluginManifestV1 = {
         default: "auto",
       },
     },
-    required: ["apiKey"],
+    required: ["knEmail", "knPassword"],
   },
   tools: [
     {

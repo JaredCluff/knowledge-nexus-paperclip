@@ -1,14 +1,22 @@
 export interface KnPluginConfig {
+  /** KN API gateway URL (handles search, reminders, auth) */
   knBaseUrl: string;
-  apiKey: string;
+  /** KN research service URL (handles memory endpoints) */
+  knResearchUrl: string;
+  /** KN service account email */
+  knEmail: string;
+  /** KN service account password */
+  knPassword: string;
   defaultScope: string;
   autoIngestOnComplete: boolean;
   autoIngestTargetStore: string;
 }
 
 export const DEFAULT_CONFIG: KnPluginConfig = {
-  knBaseUrl: "https://api.knowledgenexus.ai",
-  apiKey: "",
+  knBaseUrl: "http://localhost:8100",
+  knResearchUrl: "http://localhost:8090",
+  knEmail: "",
+  knPassword: "",
   defaultScope: "auto",
   autoIngestOnComplete: true,
   autoIngestTargetStore: "auto",

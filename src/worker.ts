@@ -19,7 +19,9 @@ async function getConfig(ctx: PluginContext): Promise<KnPluginConfig> {
   const raw = (await ctx.config.get()) as Partial<KnPluginConfig>;
   return {
     knBaseUrl: raw.knBaseUrl ?? DEFAULT_CONFIG.knBaseUrl,
-    apiKey: raw.apiKey ?? DEFAULT_CONFIG.apiKey,
+    knResearchUrl: raw.knResearchUrl ?? DEFAULT_CONFIG.knResearchUrl,
+    knEmail: raw.knEmail ?? DEFAULT_CONFIG.knEmail,
+    knPassword: raw.knPassword ?? DEFAULT_CONFIG.knPassword,
     defaultScope: raw.defaultScope ?? DEFAULT_CONFIG.defaultScope,
     autoIngestOnComplete: raw.autoIngestOnComplete ?? DEFAULT_CONFIG.autoIngestOnComplete,
     autoIngestTargetStore: raw.autoIngestTargetStore ?? DEFAULT_CONFIG.autoIngestTargetStore,
@@ -30,11 +32,11 @@ const plugin: PaperclipPlugin = definePlugin({
   async setup(ctx: PluginContext) {
     const config = await getConfig(ctx);
 
-    if (!config.apiKey) {
-      ctx.logger.warn("Knowledge Nexus plugin: no API key configured — tools will return errors");
+    if (!config.knEmail || !config.knPassword) {
+      ctx.logger.warn("Knowledge Nexus plugin: no credentials configured — tools will return errors");
     }
 
-    knClient = new KnClient(config.knBaseUrl, config.apiKey);
+    knClient = new KnClient(config.knBaseUrl, config.knResearchUrl, config.knEmail, config.knPassword);
 
     // Register agent tools
     registerSearchTool(ctx.tools, knClient, config);
@@ -63,19 +65,24 @@ const plugin: PaperclipPlugin = definePlugin({
     const raw = newConfig as Partial<KnPluginConfig>;
     const config: KnPluginConfig = {
       knBaseUrl: raw.knBaseUrl ?? DEFAULT_CONFIG.knBaseUrl,
-      apiKey: raw.apiKey ?? DEFAULT_CONFIG.apiKey,
+      knResearchUrl: raw.knResearchUrl ?? DEFAULT_CONFIG.knResearchUrl,
+      knEmail: raw.knEmail ?? DEFAULT_CONFIG.knEmail,
+      knPassword: raw.knPassword ?? DEFAULT_CONFIG.knPassword,
       defaultScope: raw.defaultScope ?? DEFAULT_CONFIG.defaultScope,
       autoIngestOnComplete: raw.autoIngestOnComplete ?? DEFAULT_CONFIG.autoIngestOnComplete,
       autoIngestTargetStore: raw.autoIngestTargetStore ?? DEFAULT_CONFIG.autoIngestTargetStore,
     };
-    knClient = new KnClient(config.knBaseUrl, config.apiKey);
+    knClient = new KnClient(config.knBaseUrl, config.knResearchUrl, config.knEmail, config.knPassword);
   },
 
   async onValidateConfig(config) {
     const errors: string[] = [];
     const typed = config as Partial<KnPluginConfig>;
-    if (!typed.apiKey) {
-      errors.push("apiKey is required");
+    if (!typed.knEmail) {
+      errors.push("knEmail is required");
+    }
+    if (!typed.knPassword) {
+      errors.push("knPassword is required");
     }
     if (typed.knBaseUrl && typeof typed.knBaseUrl !== "string") {
       errors.push("knBaseUrl must be a string");
