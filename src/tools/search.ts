@@ -1,4 +1,4 @@
-import type { ToolResult, ToolRunContext } from "@paperclipai/plugin-sdk";
+import type { PluginToolsClient, ToolResult, ToolRunContext } from "@paperclipai/plugin-sdk";
 import type { KnClient } from "../kn-client.js";
 import type { KnPluginConfig, Provenance, SearchParams } from "../types.js";
 
@@ -12,7 +12,7 @@ function provenance(runCtx: ToolRunContext): Provenance {
 }
 
 export function registerSearchTool(
-  tools: { register: Function },
+  tools: PluginToolsClient,
   client: KnClient,
   config: KnPluginConfig,
 ): void {

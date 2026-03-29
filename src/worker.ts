@@ -15,8 +15,8 @@ import { registerAutoIngest } from "./events/auto-ingest.js";
 
 let knClient: KnClient | null = null;
 
-function getConfig(ctx: PluginContext): KnPluginConfig {
-  const raw = ctx.config as Partial<KnPluginConfig>;
+async function getConfig(ctx: PluginContext): Promise<KnPluginConfig> {
+  const raw = (await ctx.config.get()) as Partial<KnPluginConfig>;
   return {
     knBaseUrl: raw.knBaseUrl ?? DEFAULT_CONFIG.knBaseUrl,
     apiKey: raw.apiKey ?? DEFAULT_CONFIG.apiKey,
@@ -28,7 +28,7 @@ function getConfig(ctx: PluginContext): KnPluginConfig {
 
 const plugin: PaperclipPlugin = definePlugin({
   async setup(ctx: PluginContext) {
-    const config = getConfig(ctx);
+    const config = await getConfig(ctx);
 
     if (!config.apiKey) {
       ctx.logger.warn("Knowledge Nexus plugin: no API key configured — tools will return errors");
@@ -54,7 +54,7 @@ const plugin: PaperclipPlugin = definePlugin({
     }
     const h = await knClient.health();
     return {
-      status: h.ok ? "ok" : "error",
+      status: h.status as "ok" | "degraded" | "error",
       message: h.message ?? (h.ok ? "Knowledge Nexus reachable" : "Knowledge Nexus unreachable"),
     };
   },
